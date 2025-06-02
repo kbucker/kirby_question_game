@@ -1,3 +1,5 @@
+## terminal command to run app locally with local creds --> python -m streamlit run app.py
+
 import streamlit as st
 import pandas as pd
 import gspread
@@ -7,9 +9,7 @@ from collections import deque
 import os
 import json
 
-## python -m streamlit run app.py
-
-# --- Auth Setup (local vs cloud) ---
+# --- Auth Setup ---
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 if "GOOGLE_CREDENTIALS" in os.environ:
     creds_dict = json.loads(os.environ["GOOGLE_CREDENTIALS"])
@@ -25,40 +25,71 @@ heavy_df = pd.DataFrame(sheet.worksheet("Heavy Questions").get_all_records())
 light_questions = light_df['Question'].dropna().tolist()
 heavy_questions = heavy_df['Question'].dropna().tolist()
 
-# --- Initialize session state ---
+# --- Session State ---
 if 'recent_questions' not in st.session_state:
     st.session_state.recent_questions = deque(maxlen=50)
 if 'current_question' not in st.session_state:
     st.session_state.current_question = ""
 if 'question_type' not in st.session_state:
-    st.session_state.question_type = "Default"
+    st.session_state.question_type = None
 
 # --- Themes ---
 themes = {
-    "Default": {
-        "page_bg": "#2c2c2c",
-        "card_bg": "#2c2c2c",
-        "text_color": "#ffffff",
-        "button_bg": "#444444",
-        "button_text": "#ffffff"
-    },
     "Light": {
-        "page_bg": "#FFF7DC",
         "card_bg": "#FFEFCB",
         "text_color": "#F68B1E",
+        "border_color": "#B85C00",
         "button_bg": "#FFD580",
-        "button_text": "#B85C00"
+        "button_text": "#B85C00",
+        "button_border": "#B85C00"
     },
     "Heavy": {
-        "page_bg": "#FFE4E6",
         "card_bg": "#FFD6DC",
         "text_color": "#CC0000",
+        "border_color": "#990000",
         "button_bg": "#FFB3C6",
-        "button_text": "#990000"
+        "button_text": "#990000",
+        "button_border": "#990000"
     }
 }
 
-# --- Choose a question ---
+# --- Global Styling ---
+st.markdown("""
+    <style>
+        body, .stApp {
+            background-color: #2c2c2c !important;
+            color: white !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            text-align: center;
+            color: white !important;
+        }
+        .question-box {
+            text-align: center;
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 2rem;
+            font-size: 1.75rem;
+            font-weight: bold;
+            border-radius: 1rem;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- Render Header ---
+st.markdown("<h1>🎲 Kirby’s Question Game</h1>", unsafe_allow_html=True)
+
+# --- Generate Question ---
 def get_question(category):
     questions = light_questions if category == "Light" else heavy_questions
     available = [q for q in questions if q not in st.session_state.recent_questions]
@@ -69,65 +100,63 @@ def get_question(category):
     st.session_state.current_question = question
     st.session_state.question_type = category
 
-# --- Handle Button Clicks BEFORE Rendering ---
-clicked = None
-col1, col2 = st.columns([1, 1])
+# --- Active Theme ---
+light_active = st.session_state.question_type == "Light"
+heavy_active = st.session_state.question_type == "Heavy"
+light_styles = themes["Light"]
+heavy_styles = themes["Heavy"]
+
+# --- Button HTML Render ---
+st.markdown('<div class="button-container">', unsafe_allow_html=True)
+col1, col2 = st.columns([1, 1], gap="large")
 with col1:
-    if st.button("🌞 Light Question", key="light_button"):
-        clicked = "Light"
+    light_clicked = st.button("🌞 Light Question", key="light_button")
 with col2:
-    if st.button("🧠 Heavy Question", key="heavy_button"):
-        clicked = "Heavy"
-if clicked:
-    get_question(clicked)
+    heavy_clicked = st.button("🧠 Heavy Question", key="heavy_button")
+st.markdown('</div>', unsafe_allow_html=True)
 
-# --- Apply theme now ---
-theme = themes.get(st.session_state.question_type, themes["Default"])
-page_style = f"""
+# --- Handle Click ---
+if light_clicked:
+    get_question("Light")
+elif heavy_clicked:
+    get_question("Heavy")
+
+# --- Button Styling ---
+st.markdown(f"""
     <style>
-        body, .stApp {{
-            background-color: {theme['page_bg']};
-            color: {theme['text_color']};
-        }}
-        .stButton > button {{
-            width: 100%;
-            font-size: 1.2rem;
-            padding: 0.8rem;
-            margin-bottom: 0.5rem;
-            border-radius: 10px;
-            font-weight: bold;
-            background-color: {theme['button_bg']};
-            color: {theme['button_text']};
-            border: none;
-        }}
-        .stButton > button:hover {{
-            filter: brightness(0.95);
-        }}
+    div[data-testid="stButton"][key="light_button"] button {{
+        background-color: {light_styles['button_bg']};
+        color: {light_styles['button_text']};
+        border: {'3px' if light_active else '2px'} solid {light_styles['button_border']};
+        box-shadow: {'0 0 12px ' + light_styles['button_border'] if light_active else 'none'};
+        font-weight: bold;
+        border-radius: 10px;
+        padding: 0.6rem 2rem;
+        font-size: 1rem;
+    }}
+    div[data-testid="stButton"][key="heavy_button"] button {{
+        background-color: {heavy_styles['button_bg']};
+        color: {heavy_styles['button_text']};
+        border: {'3px' if heavy_active else '2px'} solid {heavy_styles['button_border']};
+        box-shadow: {'0 0 12px ' + heavy_styles['button_border'] if heavy_active else 'none'};
+        font-weight: bold;
+        border-radius: 10px;
+        padding: 0.6rem 2rem;
+        font-size: 1rem;
+    }}
     </style>
-"""
-st.markdown(page_style, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-# --- Title ---
-st.markdown("<h1 style='text-align: center; margin-top: 1rem;'>🎲 Kirby’s Question Game</h1>", unsafe_allow_html=True)
-
-# --- Display Question Card ---
+# --- Show Question Output ---
 if st.session_state.current_question:
+    theme = themes[st.session_state.question_type]
     st.markdown(
         f"""
-        <div style='
+        <div class="question-box" style="
             background-color: {theme['card_bg']};
             color: {theme['text_color']};
-            padding: 2rem;
-            margin-top: 3rem;
-            border-radius: 1rem;
-            font-size: 2rem;
-            font-weight: bold;
-            text-align: center;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        '>
+            border: 2px solid {theme['border_color']};
+        ">
             {st.session_state.current_question}
         </div>
         """,
@@ -135,8 +164,6 @@ if st.session_state.current_question:
     )
 else:
     st.markdown(
-        f"<div style='margin-top: 3rem; text-align: center; font-size: 1.2rem; color: {theme['text_color']}70;'>"
-        "Click a question type above to begin."
-        "</div>",
+        "<div style='text-align:center; margin-top:2rem; color:#aaa;'>Click a question type above to begin.</div>",
         unsafe_allow_html=True
     )
