@@ -5,7 +5,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import random
 from collections import deque
 
-## streamlit run app.py
+## python -m streamlit run app.py
 
 # --- Google Sheets API Setup ---
 scope = [
