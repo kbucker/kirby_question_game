@@ -1,4 +1,4 @@
-## terminal command to run app locally with local creds --> python -m streamlit run app.py
+## http://localhost:8501/
 
 import streamlit as st
 import pandas as pd
@@ -31,7 +31,7 @@ if 'recent_questions' not in st.session_state:
 if 'current_question' not in st.session_state:
     st.session_state.current_question = ""
 if 'question_type' not in st.session_state:
-    st.session_state.question_type = None
+    st.session_state.question_type = "None"
 
 # --- Themes ---
 themes = {
@@ -50,46 +50,32 @@ themes = {
         "button_bg": "#FFB3C6",
         "button_text": "#990000",
         "button_border": "#990000"
+    },
+    "Default": {
+        "card_bg": "#ffffff",
+        "text_color": "#ffffff",
+        "border_color": "#444444",
+        "button_bg": "#444444",
+        "button_text": "#ffffff",
+        "button_border": "#666666"
     }
 }
 
-# --- Global Styling ---
+# --- Always-on charcoal background and title ---
 st.markdown("""
     <style>
         body, .stApp {
             background-color: #2c2c2c !important;
-            color: white !important;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            color: #ffffff !important;
         }
         h1 {
+            color: #ffffff !important;
             text-align: center;
-            color: white !important;
-        }
-        .question-box {
-            text-align: center;
-            max-width: 700px;
-            margin: 2rem auto;
-            padding: 2rem;
-            font-size: 1.75rem;
-            font-weight: bold;
-            border-radius: 1rem;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .button-container {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# --- Render Header ---
-st.markdown("<h1>🎲 Kirby’s Question Game</h1>", unsafe_allow_html=True)
-
-# --- Generate Question ---
+# --- Choose a question ---
 def get_question(category):
     questions = light_questions if category == "Light" else heavy_questions
     available = [q for q in questions if q not in st.session_state.recent_questions]
@@ -100,63 +86,75 @@ def get_question(category):
     st.session_state.current_question = question
     st.session_state.question_type = category
 
-# --- Active Theme ---
-light_active = st.session_state.question_type == "Light"
-heavy_active = st.session_state.question_type == "Heavy"
-light_styles = themes["Light"]
-heavy_styles = themes["Heavy"]
-
-# --- Button HTML Render ---
-st.markdown('<div class="button-container">', unsafe_allow_html=True)
-col1, col2 = st.columns([1, 1], gap="large")
+# --- Handle button click ---
+clicked = None
+col1, col2 = st.columns([1, 1])
 with col1:
-    light_clicked = st.button("🌞 Light Question", key="light_button")
+    if st.button("🌞 Light Question", key="light"):
+        clicked = "Light"
 with col2:
-    heavy_clicked = st.button("🧠 Heavy Question", key="heavy_button")
-st.markdown('</div>', unsafe_allow_html=True)
+    if st.button("🧠 Heavy Question", key="heavy"):
+        clicked = "Heavy"
+if clicked:
+    get_question(clicked)
 
-# --- Handle Click ---
-if light_clicked:
-    get_question("Light")
-elif heavy_clicked:
-    get_question("Heavy")
+# --- Active theme ---
+qtype = st.session_state.question_type
+theme = themes.get(qtype, themes["Default"])
 
-# --- Button Styling ---
+# --- Style Buttons ---
+highlight_style = """
+    border: 3px solid {border};
+    box-shadow: 0 0 8px {border};
+"""
 st.markdown(f"""
     <style>
-    div[data-testid="stButton"][key="light_button"] button {{
-        background-color: {light_styles['button_bg']};
-        color: {light_styles['button_text']};
-        border: {'3px' if light_active else '2px'} solid {light_styles['button_border']};
-        box-shadow: {'0 0 12px ' + light_styles['button_border'] if light_active else 'none'};
-        font-weight: bold;
-        border-radius: 10px;
-        padding: 0.6rem 2rem;
-        font-size: 1rem;
-    }}
-    div[data-testid="stButton"][key="heavy_button"] button {{
-        background-color: {heavy_styles['button_bg']};
-        color: {heavy_styles['button_text']};
-        border: {'3px' if heavy_active else '2px'} solid {heavy_styles['button_border']};
-        box-shadow: {'0 0 12px ' + heavy_styles['button_border'] if heavy_active else 'none'};
-        font-weight: bold;
-        border-radius: 10px;
-        padding: 0.6rem 2rem;
-        font-size: 1rem;
-    }}
+        .stButton > button {{
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }}
+        div.stButton > button:first-child {{
+            background-color: {themes["Light"]["button_bg"]};
+            color: {themes["Light"]["button_text"]};
+            border: 2px solid {themes["Light"]["button_border"]};
+            {"border: 3px solid " + themes["Light"]["button_border"] + "; box-shadow: 0 0 10px " + themes["Light"]["button_border"] + ";" if qtype == "Light" else ""}
+        }}
+        div.stButton > button:nth-child(1) {{
+            background-color: {themes["Heavy"]["button_bg"]};
+            color: {themes["Heavy"]["button_text"]};
+            border: 2px solid {themes["Heavy"]["button_border"]};
+            {"border: 3px solid " + themes["Heavy"]["button_border"] + "; box-shadow: 0 0 10px " + themes["Heavy"]["button_border"] + ";" if qtype == "Heavy" else ""}
+        }}
     </style>
 """, unsafe_allow_html=True)
 
-# --- Show Question Output ---
+# --- Title ---
+st.markdown("<h1>🎲 Kirby’s Question Game</h1>", unsafe_allow_html=True)
+
+# --- Output question card ---
 if st.session_state.current_question:
-    theme = themes[st.session_state.question_type]
     st.markdown(
         f"""
-        <div class="question-box" style="
+        <div style='
             background-color: {theme['card_bg']};
             color: {theme['text_color']};
+            padding: 2rem;
+            margin-top: 3rem;
+            border-radius: 1rem;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
             border: 2px solid {theme['border_color']};
-        ">
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        '>
             {st.session_state.current_question}
         </div>
         """,
@@ -164,6 +162,8 @@ if st.session_state.current_question:
     )
 else:
     st.markdown(
-        "<div style='text-align:center; margin-top:2rem; color:#aaa;'>Click a question type above to begin.</div>",
+        "<div style='margin-top: 3rem; text-align: center; font-size: 1.2rem; color: #999;'>"
+        "Click a question type above to begin."
+        "</div>",
         unsafe_allow_html=True
     )
