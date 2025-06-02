@@ -3,6 +3,8 @@ import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import random
+import json
+import os
 from collections import deque
 
 ## python -m streamlit run app.py
@@ -12,7 +14,9 @@ scope = [
     "https://spreadsheets.google.com/feeds",
     "https://www.googleapis.com/auth/drive"
 ]
-creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+creds = ServiceAccountCredentials.from_json_keyfile_dict(
+    json.loads(os.environ["GOOGLE_CREDENTIALS"]), scope
+)
 client = gspread.authorize(creds)
 
 # --- Open Google Sheet by ID ---
