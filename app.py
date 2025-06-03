@@ -72,6 +72,9 @@ st.markdown("""
         h1 {
             color: #ffffff !important;
             text-align: center;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
         }
         .stButton > button {
             font-size: 28px !important;      /* Force larger font */
@@ -82,7 +85,7 @@ st.markdown("""
             padding: 0.3rem 0.75rem !important;
             width: 100% !important;
             border-radius: 12px;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.1rem;
             transition: all 0.3s ease;
             display: flex;
             justify-content: center;
@@ -153,7 +156,7 @@ if st.session_state.current_question:
         <div style='background-color: {theme['card_bg']};
                     color: {theme['text_color']};
                     padding: 2rem;
-                    margin-top: 0.5rem;
+                    margin-top: 0.25rem;
                     border-radius: 1rem;
                     font-size: 2rem;
                     font-weight: bold;
@@ -170,7 +173,7 @@ if st.session_state.current_question:
     )
 else:
     st.markdown(
-        """<div style='margin-top: 0.5rem; text-align: center; font-size: 2rem; color: #999;'>
+        """<div style='margin-top: 0.25rem; text-align: center; font-size: 2rem; color: #999;'>
         Click a question option above to begin.
         </div>""",
         unsafe_allow_html=True
