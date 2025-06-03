@@ -65,7 +65,8 @@ themes = {
 # --- Always-on charcoal background and title ---
 st.markdown("""
     <style>
-        h1 a, h2 a, h3 a {
+        /* Remove the anchor link icon next to Streamlit headings to fix the centering of the title on mobile */
+        .stMarkdown .css-10trblm.e1nzilvr1 a {
             display: none !important;
         }
         body, .stApp {
@@ -78,6 +79,12 @@ st.markdown("""
             font-size: 0.5rem;
             line-height: 1.2;
             margin-bottom: 1rem;
+        }
+        .main-title {
+            text-align: center;
+            margin: 0 auto;
+            font-size: 1.5rem;
+            color: #ffffff !important;
         }
         .stButton > button {
             font-size: 28px !important;      /* Force larger font */
@@ -99,7 +106,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Title ---
-st.markdown("<h3>  🃏 Kirby’s Question Game 🃏</h3>", unsafe_allow_html=True)
+st.markdown("<h3 class='main-title'>🃏 Kirby’s Question Game</h3>", unsafe_allow_html=True)
 
 # --- Choose a question ---
 def get_question(category):
@@ -176,7 +183,7 @@ if st.session_state.current_question:
     )
 else:
     st.markdown(
-        """<div style='margin-top: 0.25rem; text-align: center; font-size: 2rem; color: #999;'>
+        """<div style='margin-top: 0.25rem; text-align: center; font-size: 1.5rem; color: #999;'>
         Click a question option above to begin.
         </div>""",
         unsafe_allow_html=True
