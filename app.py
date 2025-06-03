@@ -65,6 +65,9 @@ themes = {
 # --- Always-on charcoal background and title ---
 st.markdown("""
     <style>
+        h1 a, h2 a, h3 a {
+            display: none !important;
+        }
         body, .stApp {
             background-color: #2c2c2c !important;
             color: #ffffff !important;
@@ -96,7 +99,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Title ---
-st.markdown("<h3>🃏 Kirby’s Question Game 🃏</h3>", unsafe_allow_html=True)
+st.markdown("<h3>  🃏 Kirby’s Question Game 🃏</h3>", unsafe_allow_html=True)
 
 # --- Choose a question ---
 def get_question(category):
