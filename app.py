@@ -1,3 +1,4 @@
+## streamlit run app.py
 ## http://localhost:8501/
 
 import streamlit as st
@@ -86,6 +87,9 @@ def get_question(category):
     st.session_state.current_question = question
     st.session_state.question_type = category
 
+# --- Title ---
+st.markdown("<h1>🃏 Kirby’s Question Game 🃏</h1>", unsafe_allow_html=True)
+
 # --- Handle button click ---
 clicked = None
 col1, col2 = st.columns([1, 1])
@@ -112,7 +116,7 @@ st.markdown(f"""
         .stButton > button {{
             width: 100%;
             padding: 0.75rem;
-            font-size: 1.1rem;
+            font-size: 1.5rem;
             font-weight: bold;
             border-radius: 10px;
             margin-bottom: 0.5rem;
@@ -132,9 +136,6 @@ st.markdown(f"""
         }}
     </style>
 """, unsafe_allow_html=True)
-
-# --- Title ---
-st.markdown("<h1>🎲 Kirby’s Question Game</h1>", unsafe_allow_html=True)
 
 # --- Output question card ---
 if st.session_state.current_question:
@@ -162,7 +163,7 @@ if st.session_state.current_question:
     )
 else:
     st.markdown(
-        "<div style='margin-top: 3rem; text-align: center; font-size: 1.2rem; color: #999;'>"
+        "<div style='margin-top: 3rem; text-align: center; font-size: 2rem; color: #999;'>"
         "Click a question type above to begin."
         "</div>",
         unsafe_allow_html=True
