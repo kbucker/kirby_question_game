@@ -53,7 +53,7 @@ themes = {
         "button_border": "#990000"
     },
     "Default": {
-        "card_bg": "#ffffff",
+        "card_bg": "#2c2c2c",
         "text_color": "#ffffff",
         "border_color": "#444444",
         "button_bg": "#444444",
@@ -73,8 +73,27 @@ st.markdown("""
             color: #ffffff !important;
             text-align: center;
         }
+        .stButton > button {
+            font-size: 28px !important;      /* Force larger font */
+            font-weight: 900 !important;     /* Max bold */
+            line-height: 32px !important;    /* Prevent cutoff */
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.15);
+            padding: 0.3rem 0.75rem !important;
+            width: 100% !important;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
     </style>
 """, unsafe_allow_html=True)
+
+# --- Title ---
+st.markdown("<h1>🃏 Kirby’s Question Game 🃏</h1>", unsafe_allow_html=True)
 
 # --- Choose a question ---
 def get_question(category):
@@ -86,54 +105,44 @@ def get_question(category):
     question = random.choice(available)
     st.session_state.current_question = question
     st.session_state.question_type = category
+    st.session_state.recent_questions.append(question)
+    return category
 
-# --- Title ---
-st.markdown("<h1>🃏 Kirby’s Question Game 🃏</h1>", unsafe_allow_html=True)
-
-# --- Handle button click ---
+# --- Buttons ---
 clicked = None
 col1, col2 = st.columns([1, 1])
+
 with col1:
     if st.button("🌞 Light Question", key="light"):
-        clicked = "Light"
+        clicked = get_question("Light")
 with col2:
     if st.button("🧠 Heavy Question", key="heavy"):
-        clicked = "Heavy"
-if clicked:
-    get_question(clicked)
+        clicked = get_question("Heavy")
 
-# --- Active theme ---
+# --- Active theme (updated after click) ---
 qtype = st.session_state.question_type
 theme = themes.get(qtype, themes["Default"])
 
-# --- Style Buttons ---
-highlight_style = """
-    border: 3px solid {border};
-    box-shadow: 0 0 8px {border};
-"""
+# --- Restyle buttons ---
+light_theme = themes["Light"]
+heavy_theme = themes["Heavy"]
+
 st.markdown(f"""
     <style>
-        .stButton > button {{
-            width: 100%;
-            padding: 0.75rem;
-            font-size: 1.5rem;
-            font-weight: bold;
-            border-radius: 10px;
-            margin-bottom: 0.5rem;
-            transition: all 0.3s ease;
-        }}
-        div.stButton > button:first-child {{
-            background-color: {themes["Light"]["button_bg"]};
-            color: {themes["Light"]["button_text"]};
-            border: 2px solid {themes["Light"]["button_border"]};
-            {"border: 3px solid " + themes["Light"]["button_border"] + "; box-shadow: 0 0 10px " + themes["Light"]["button_border"] + ";" if qtype == "Light" else ""}
-        }}
-        div.stButton > button:nth-child(1) {{
-            background-color: {themes["Heavy"]["button_bg"]};
-            color: {themes["Heavy"]["button_text"]};
-            border: 2px solid {themes["Heavy"]["button_border"]};
-            {"border: 3px solid " + themes["Heavy"]["button_border"] + "; box-shadow: 0 0 10px " + themes["Heavy"]["button_border"] + ";" if qtype == "Heavy" else ""}
-        }}
+    div[data-testid="stHorizontalBlock"] > div:first-child button {{
+        background-color: {light_theme["button_bg"]} !important;
+        color: {light_theme["button_text"]} !important;
+        border: 2px solid {light_theme["button_border"]} !important;
+        {"border: 3px solid " + theme['button_border'] + "; box-shadow: 0 0 14px 4px " + theme['button_border'] + ";" if qtype == "Light" else ""}
+
+    }}
+    div[data-testid="stHorizontalBlock"] > div:nth-child(2) button {{
+        background-color: {heavy_theme["button_bg"]} !important;
+        color: {heavy_theme["button_text"]} !important;
+        border: 2px solid {heavy_theme["button_border"]} !important;
+        {"border: 3px solid " + theme['button_border'] + "; box-shadow: 0 0 14px 4px " + theme['button_border'] + ";" if qtype == "Heavy" else ""}
+
+    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -141,21 +150,19 @@ st.markdown(f"""
 if st.session_state.current_question:
     st.markdown(
         f"""
-        <div style='
-            background-color: {theme['card_bg']};
-            color: {theme['text_color']};
-            padding: 2rem;
-            margin-top: 3rem;
-            border-radius: 1rem;
-            font-size: 2rem;
-            font-weight: bold;
-            text-align: center;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            border: 2px solid {theme['border_color']};
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        '>
+        <div style='background-color: {theme['card_bg']};
+                    color: {theme['text_color']};
+                    padding: 2rem;
+                    margin-top: 0.5rem;
+                    border-radius: 1rem;
+                    font-size: 2rem;
+                    font-weight: bold;
+                    text-align: center;
+                    max-width: 700px;
+                    margin-left: auto;
+                    margin-right: auto;
+                    border: 2px solid {theme['border_color']};
+                    box-shadow: 0 0 10px rgba(0,0,0,0.1);'>
             {st.session_state.current_question}
         </div>
         """,
@@ -163,8 +170,8 @@ if st.session_state.current_question:
     )
 else:
     st.markdown(
-        "<div style='margin-top: 3rem; text-align: center; font-size: 2rem; color: #999;'>"
-        "Click a question type above to begin."
-        "</div>",
+        """<div style='margin-top: 0.5rem; text-align: center; font-size: 2rem; color: #999;'>
+        Click a question option above to begin.
+        </div>""",
         unsafe_allow_html=True
     )
