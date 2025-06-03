@@ -69,10 +69,10 @@ st.markdown("""
             background-color: #2c2c2c !important;
             color: #ffffff !important;
         }
-        h1 {
+        h3 {
             color: #ffffff !important;
             text-align: center;
-            font-size: clamp(1rem, 4vw, 2rem);
+            font-size: 0.5rem;
             line-height: 1.2;
             margin-bottom: 1rem;
         }
@@ -96,7 +96,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Title ---
-st.markdown("<h1>🃏 Kirby’s Question Game 🃏</h1>", unsafe_allow_html=True)
+st.markdown("<h3>🃏 Kirby’s Question Game 🃏</h3>", unsafe_allow_html=True)
 
 # --- Choose a question ---
 def get_question(category):
