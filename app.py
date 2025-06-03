@@ -72,9 +72,9 @@ st.markdown("""
         h1 {
             color: #ffffff !important;
             text-align: center;
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-size: clamp(1rem, 4vw, 2rem);
             line-height: 1.2;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
         }
         .stButton > button {
             font-size: 28px !important;      /* Force larger font */
