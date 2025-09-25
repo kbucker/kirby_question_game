@@ -93,7 +93,9 @@ st.markdown("""
             letter-spacing: 0.5px;
             text-shadow: 1px 1px 1px rgba(0,0,0,0.15);
             padding: 0.3rem 0.75rem !important;
-            width: 100% !important;
+            /* width: 100% !important;   <-- REMOVE THIS */
+            width: auto !important;        /* Let button size to its content */
+            min-width: 240px;              /* Optional: keeps nice tactile size */
             border-radius: 12px;
             margin-bottom: 0.1rem;
             transition: all 0.3s ease;
@@ -141,22 +143,47 @@ light_theme = themes["Light"]
 heavy_theme = themes["Heavy"]
 
 st.markdown(f"""
-    <style>
-    div[data-testid="stHorizontalBlock"] > div:first-child button {{
-        background-color: {light_theme["button_bg"]} !important;
-        color: {light_theme["button_text"]} !important;
-        border: 2px solid {light_theme["button_border"]} !important;
-        {"border: 3px solid " + theme['button_border'] + "; box-shadow: 0 0 14px 4px " + theme['button_border'] + ";" if qtype == "Light" else ""}
+<style>
+/* Center the container that holds the two columns/buttons */
+div[data-testid="stHorizontalBlock"] {{
+    justify-content: center;   /* center the two button columns */
+    gap: 24px;                 /* space between them (adjust as you like) */
+    flex-wrap: nowrap;         /* keep them side-by-side even on mobile */
+}}
 
-    }}
-    div[data-testid="stHorizontalBlock"] > div:nth-child(2) button {{
-        background-color: {heavy_theme["button_bg"]} !important;
-        color: {heavy_theme["button_text"]} !important;
-        border: 2px solid {heavy_theme["button_border"]} !important;
-        {"border: 3px solid " + theme['button_border'] + "; box-shadow: 0 0 14px 4px " + theme['button_border'] + ";" if qtype == "Heavy" else ""}
+/* Make each column shrink to fit button contents */
+div[data-testid="stHorizontalBlock"] > div {{
+    flex: 0 0 auto;            
+    width: auto !important;    
+}}
 
+/* Light Question button styling */
+div[data-testid="stHorizontalBlock"] > div:first-child button {{
+    background-color: {light_theme["button_bg"]} !important;
+    color: {light_theme["button_text"]} !important;
+    border: 2px solid {light_theme["button_border"]} !important;
+    width: auto !important;        /* don’t stretch full width */
+    min-width: 160px;              /* keeps button tap-friendly */
+    {"border: 3px solid " + theme['button_border'] + "; box-shadow: 0 0 14px 4px " + theme['button_border'] + ";" if qtype == "Light" else ""}
+}}
+
+/* Heavy Question button styling */
+div[data-testid="stHorizontalBlock"] > div:nth-child(2) button {{
+    background-color: {heavy_theme["button_bg"]} !important;
+    color: {heavy_theme["button_text"]} !important;
+    border: 2px solid {heavy_theme["button_border"]} !important;
+    width: auto !important;
+    min-width: 160px;
+    {"border: 3px solid " + theme['button_border'] + "; box-shadow: 0 0 14px 4px " + theme['button_border'] + ";" if qtype == "Heavy" else ""}
+}}
+
+/* Responsive tweak: tighten spacing on very small screens */
+@media (max-width: 640px) {{
+    div[data-testid="stHorizontalBlock"] {{
+        gap: 12px;
     }}
-    </style>
+}}
+</style>
 """, unsafe_allow_html=True)
 
 # --- Output question card ---
