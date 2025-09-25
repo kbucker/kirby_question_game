@@ -95,7 +95,7 @@ st.markdown("""
             padding: 0.3rem 0.75rem !important;
             /* width: 100% !important;   <-- REMOVE THIS */
             width: auto !important;        /* Let button size to its content */
-            min-width: 240px;              /* Optional: keeps nice tactile size */
+            min-width: 140px;              /* Optional: keeps nice tactile size */
             border-radius: 12px;
             margin-bottom: 0.1rem;
             transition: all 0.3s ease;
@@ -127,6 +127,43 @@ def get_question(category):
 clicked = None
 col1, col2 = st.columns([1, 1])
 
+st.markdown("""
+<style>
+/* Keep two columns side-by-side on small screens without overflow */
+@media (max-width: 680px) {
+  /* Turn the columns wrapper into a tight 2-col grid */
+  div[data-testid="stHorizontalBlock"]{
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important; /* minmax(0,1fr) prevents content-based overflow */
+    column-gap: 8px !important;  /* small gutter fits phones */
+    row-gap: 0 !important;
+    justify-items: stretch !important;
+    align-items: start !important;
+  }
+
+  /* Remove Streamlit's side padding that otherwise pushes us >100% */
+  div[data-testid="stHorizontalBlock"] > div[data-testid="column"]{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    min-width: 0 !important;   /* allow the column to shrink */
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  /* Make buttons fit the (narrow) grid cells without overflow */
+  div[data-testid="stHorizontalBlock"] .stButton > button{
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;   /* ignore any larger global min-width */
+    white-space: nowrap;       /* keep label on one line */
+  }
+}
+
+/* (Optional) tighten the default gap slightly on all screens */
+div[data-testid="stHorizontalBlock"] { gap: 0.75rem; }
+</style>
+""", unsafe_allow_html=True)
+
 with col1:
     if st.button("🌞 Light Question", key="light"):
         clicked = get_question("Light")
@@ -144,46 +181,20 @@ heavy_theme = themes["Heavy"]
 
 st.markdown(f"""
 <style>
-/* Center the container that holds the two columns/buttons */
-div[data-testid="stHorizontalBlock"] {{
-    justify-content: center;   /* center the two button columns */
-    gap: 24px;                 /* space between them (adjust as you like) */
-    flex-wrap: nowrap;         /* keep them side-by-side even on mobile */
+    div[data-testid="stHorizontalBlock"] > div:first-child button {{
+        background-color: {light_theme["button_bg"]} !important;
+        color: {light_theme["button_text"]} !important;
+        border: 2px solid {light_theme["button_border"]} !important;
+        {"border: 3px solid " + theme['button_border'] + "; box-shadow: 0 0 14px 4px " + theme['button_border'] + ";" if qtype == "Light" else ""}
 }}
+    div[data-testid="stHorizontalBlock"] > div:nth-child(2) button {{
+        background-color: {heavy_theme["button_bg"]} !important;
+        color: {heavy_theme["button_text"]} !important;
+        border: 2px solid {heavy_theme["button_border"]} !important;
+        {"border: 3px solid " + theme['button_border'] + "; box-shadow: 0 0 14px 4px " + theme['button_border'] + ";" if qtype == "Heavy" else ""}
 
-/* Make each column shrink to fit button contents */
-div[data-testid="stHorizontalBlock"] > div {{
-    flex: 0 0 auto;            
-    width: auto !important;    
-}}
-
-/* Light Question button styling */
-div[data-testid="stHorizontalBlock"] > div:first-child button {{
-    background-color: {light_theme["button_bg"]} !important;
-    color: {light_theme["button_text"]} !important;
-    border: 2px solid {light_theme["button_border"]} !important;
-    width: auto !important;        /* don’t stretch full width */
-    min-width: 160px;              /* keeps button tap-friendly */
-    {"border: 3px solid " + theme['button_border'] + "; box-shadow: 0 0 14px 4px " + theme['button_border'] + ";" if qtype == "Light" else ""}
-}}
-
-/* Heavy Question button styling */
-div[data-testid="stHorizontalBlock"] > div:nth-child(2) button {{
-    background-color: {heavy_theme["button_bg"]} !important;
-    color: {heavy_theme["button_text"]} !important;
-    border: 2px solid {heavy_theme["button_border"]} !important;
-    width: auto !important;
-    min-width: 160px;
-    {"border: 3px solid " + theme['button_border'] + "; box-shadow: 0 0 14px 4px " + theme['button_border'] + ";" if qtype == "Heavy" else ""}
-}}
-
-/* Responsive tweak: tighten spacing on very small screens */
-@media (max-width: 640px) {{
-    div[data-testid="stHorizontalBlock"] {{
-        gap: 12px;
     }}
-}}
-</style>
+    </style>
 """, unsafe_allow_html=True)
 
 # --- Output question card ---
