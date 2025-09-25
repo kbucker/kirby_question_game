@@ -95,7 +95,7 @@ st.markdown("""
             padding: 0.3rem 0.75rem !important;
             /* width: 100% !important;   <-- REMOVE THIS */
             width: auto !important;        /* Let button size to its content */
-            min-width: 140px;              /* Optional: keeps nice tactile size */
+            min-width: 200px;              /* Optional: keeps nice tactile size */
             border-radius: 12px;
             margin-bottom: 0.1rem;
             transition: all 0.3s ease;
@@ -161,6 +161,12 @@ st.markdown("""
 
 /* (Optional) tighten the default gap slightly on all screens */
 div[data-testid="stHorizontalBlock"] { gap: 0.75rem; }
+
+/* Center buttons within each column by default */
+div[data-testid="stHorizontalBlock"] .stButton > button {
+    margin-left: auto !important;
+    margin-right: auto !important;
+
 </style>
 """, unsafe_allow_html=True)
 
