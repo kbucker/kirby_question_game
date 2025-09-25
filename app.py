@@ -129,43 +129,25 @@ col1, col2 = st.columns([1, 1])
 
 st.markdown("""
 <style>
-/* Keep two columns side-by-side on small screens without overflow */
-@media (max-width: 680px) {
-  /* Turn the columns wrapper into a tight 2-col grid */
-  div[data-testid="stHorizontalBlock"]{
+/* Force 2-column grid and center it */
+div[data-testid="stHorizontalBlock"] {
     display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important; /* minmax(0,1fr) prevents content-based overflow */
-    column-gap: 8px !important;  /* small gutter fits phones */
-    row-gap: 0 !important;
-    justify-items: stretch !important;
-    align-items: start !important;
-  }
-
-  /* Remove Streamlit's side padding that otherwise pushes us >100% */
-  div[data-testid="stHorizontalBlock"] > div[data-testid="column"]{
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    min-width: 0 !important;   /* allow the column to shrink */
-    width: auto !important;
-    max-width: none !important;
-  }
-
-  /* Make buttons fit the (narrow) grid cells without overflow */
-  div[data-testid="stHorizontalBlock"] .stButton > button{
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;   /* ignore any larger global min-width */
-    white-space: nowrap;       /* keep label on one line */
-  }
-}
-
-/* (Optional) tighten the default gap slightly on all screens */
-div[data-testid="stHorizontalBlock"] { gap: 0.75rem; }
-
-/* Center buttons within each column by default */
-div[data-testid="stHorizontalBlock"] .stButton > button {
+    grid-template-columns: repeat(2, auto) !important;  /* shrink to fit content */
+    column-gap: 20px !important;                        /* adjust gap */
+    justify-content: center !important;                 /* center whole grid */
     margin-left: auto !important;
     margin-right: auto !important;
+}
+
+/* Kill Streamlit’s column padding */
+div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+div[data-testid="stVerticalBlock"] {
+    gap: 0.5rem !important;   /* tighten vertical spacing */
+}
 
 </style>
 """, unsafe_allow_html=True)
@@ -210,7 +192,7 @@ if st.session_state.current_question:
         <div style='background-color: {theme['card_bg']};
                     color: {theme['text_color']};
                     padding: 2rem;
-                    margin-top: 0.25rem;
+                    margin-top: 1rem;
                     border-radius: 1rem;
                     font-size: 2rem;
                     font-weight: bold;
@@ -227,7 +209,7 @@ if st.session_state.current_question:
     )
 else:
     st.markdown(
-        """<div style='margin-top: 0.25rem; text-align: center; font-size: 1.5rem; color: #999;'>
+        """<div style='margin-top: 1rem; text-align: center; font-size: 1.5rem; color: #999;'>
         Click a question option above to begin.
         </div>""",
         unsafe_allow_html=True
