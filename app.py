@@ -21,10 +21,16 @@ client = gspread.authorize(creds)
 
 # --- Load questions ---
 sheet = client.open_by_key("1zW6EmhzKKvpjkeIsbPasrFT6lPly8HWtpDxQS0YGZ9k")
+
 light_df = pd.DataFrame(sheet.worksheet("Light Questions").get_all_records())
 heavy_df = pd.DataFrame(sheet.worksheet("Heavy Questions").get_all_records())
-light_questions = light_df['Question'].dropna().tolist()
-heavy_questions = heavy_df['Question'].dropna().tolist()
+sexy_df  = pd.DataFrame(sheet.worksheet("Sexy Questions").get_all_records())
+who_df   = pd.DataFrame(sheet.worksheet("Who Here").get_all_records())
+
+light_questions    = light_df['Question'].dropna().tolist()
+heavy_questions    = heavy_df['Question'].dropna().tolist()
+sexy_questions     = sexy_df['Question'].dropna().tolist()
+who_here_questions = who_df['Question'].dropna().tolist()
 
 # --- Session State ---
 if 'recent_questions' not in st.session_state:
@@ -51,6 +57,24 @@ themes = {
         "button_bg": "#FFB3C6",
         "button_text": "#990000",
         "button_border": "#990000"
+    },
+    # New purple theme (Sexy Questions)
+    "Sexy": {
+        "card_bg": "#F4ECFF",
+        "text_color": "#730FC3",   # deep purple
+        "border_color": "#730FC3",
+        "button_bg": "#AB91D5",   # light purple
+        "button_text": "#730FC3",
+        "button_border": "#730FC3"
+    },
+    # New blue theme (Who Here)
+    "Who Here": {
+        "card_bg": "#EAF8FF",
+        "text_color": "#2596BE",  # deep blue
+        "border_color": "#2596BE",
+        "button_bg": "#A2CCDC",   # light blue
+        "button_text": "#175D7A",
+        "button_border": "#2596BE"
     },
     "Default": {
         "card_bg": "#2c2c2c",
@@ -87,15 +111,14 @@ st.markdown("""
             color: #ffffff !important;
         }
         .stButton > button {
-            font-size: 28px !important;      /* Force larger font */
-            font-weight: 900 !important;     /* Max bold */
-            line-height: 32px !important;    /* Prevent cutoff */
+            font-size: 28px !important;
+            font-weight: 900 !important;
+            line-height: 32px !important;
             letter-spacing: 0.5px;
             text-shadow: 1px 1px 1px rgba(0,0,0,0.15);
             padding: 0.3rem 0.75rem !important;
-            /* width: 100% !important;   <-- REMOVE THIS */
-            width: auto !important;        /* Let button size to its content */
-            min-width: 200px;              /* Optional: keeps nice tactile size */
+            width: auto !important;
+            min-width: 200px;
             border-radius: 12px;
             margin-bottom: 0.1rem;
             transition: all 0.3s ease;
@@ -111,30 +134,40 @@ st.markdown("""
 st.markdown("<h3 class='main-title'>🃏 Kirby’s Question Game</h3>", unsafe_allow_html=True)
 
 # --- Choose a question ---
-def get_question(category):
-    questions = light_questions if category == "Light" else heavy_questions
+def get_question(category: str):
+    if category == "Light":
+        questions = light_questions
+    elif category == "Heavy":
+        questions = heavy_questions
+    elif category == "Sexy":
+        questions = sexy_questions
+    elif category == "Who Here":
+        questions = who_here_questions
+    else:
+        questions = []
+
+    if not questions:
+        return
+
     available = [q for q in questions if q not in st.session_state.recent_questions]
     if not available:
         st.session_state.recent_questions.clear()
         available = questions
+
     question = random.choice(available)
     st.session_state.current_question = question
     st.session_state.question_type = category
     st.session_state.recent_questions.append(question)
-    return category
 
-# --- Buttons ---
-clicked = None
-col1, col2 = st.columns([1, 1])
-
+# --- Layout tweaks for the button rows ---
 st.markdown("""
 <style>
-/* Force 2-column grid and center it */
+/* Force 2-column grid and center each row of columns */
 div[data-testid="stHorizontalBlock"] {
     display: grid !important;
-    grid-template-columns: repeat(2, auto) !important;  /* shrink to fit content */
-    column-gap: 20px !important;                        /* adjust gap */
-    justify-content: center !important;                 /* center whole grid */
+    grid-template-columns: repeat(2, auto) !important;
+    column-gap: 20px !important;
+    justify-content: center !important;
     margin-left: auto !important;
     margin-right: auto !important;
 }
@@ -146,44 +179,79 @@ div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
 }
 
 div[data-testid="stVerticalBlock"] {
-    gap: 0.5rem !important;   /* tighten vertical spacing */
+    gap: 0.5rem !important;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
-with col1:
+# --- Buttons: 2x2 grid (two horizontal blocks / rows) ---
+# Row 1: Light / Heavy
+top_left_col, top_right_col = st.columns([1, 1])
+# Row 2: Sexy / Who Here
+bottom_left_col, bottom_right_col = st.columns([1, 1])
+
+with top_left_col:
     if st.button("🌞 Light Question", key="light"):
-        clicked = get_question("Light")
-with col2:
+        get_question("Light")
+
+with top_right_col:
     if st.button("🧠 Heavy Question", key="heavy"):
-        clicked = get_question("Heavy")
+        get_question("Heavy")
+
+with bottom_left_col:
+    if st.button("🫦 Sexy Questions", key="sexy"):
+        get_question("Sexy")
+
+with bottom_right_col:
+    if st.button("🔄 Who Here...", key="who_here"):
+        get_question("Who Here")
 
 # --- Active theme (updated after click) ---
 qtype = st.session_state.question_type
 theme = themes.get(qtype, themes["Default"])
 
-# --- Restyle buttons ---
+# --- Restyle buttons for all four types ---
 light_theme = themes["Light"]
 heavy_theme = themes["Heavy"]
+sexy_theme  = themes["Sexy"]
+who_theme   = themes["Who Here"]
 
 st.markdown(f"""
 <style>
-    div[data-testid="stHorizontalBlock"] > div:first-child button {{
+    /* Light button */
+    .st-key-light .stButton button {{
         background-color: {light_theme["button_bg"]} !important;
         color: {light_theme["button_text"]} !important;
         border: 2px solid {light_theme["button_border"]} !important;
-        {"border: 3px solid " + theme['button_border'] + "; box-shadow: 0 0 14px 4px " + theme['button_border'] + ";" if qtype == "Light" else ""}
-}}
-    div[data-testid="stHorizontalBlock"] > div:nth-child(2) button {{
+        {"border: 3px solid " + light_theme["button_border"] + "; box-shadow: 0 0 14px 4px " + light_theme["button_border"] + ";" if qtype == "Light" else ""}
+    }}
+
+    /* Heavy button */
+    .st-key-heavy .stButton button {{
         background-color: {heavy_theme["button_bg"]} !important;
         color: {heavy_theme["button_text"]} !important;
         border: 2px solid {heavy_theme["button_border"]} !important;
-        {"border: 3px solid " + theme['button_border'] + "; box-shadow: 0 0 14px 4px " + theme['button_border'] + ";" if qtype == "Heavy" else ""}
-
+        {"border: 3px solid " + heavy_theme["button_border"] + "; box-shadow: 0 0 14px 4px " + heavy_theme["button_border"] + ";" if qtype == "Heavy" else ""}
     }}
-    </style>
+
+    /* Sexy button */
+    .st-key-sexy .stButton button {{
+        background-color: {sexy_theme["button_bg"]} !important;
+        color: {sexy_theme["button_text"]} !important;
+        border: 2px solid {sexy_theme["button_border"]} !important;
+        {"border: 3px solid " + sexy_theme["button_border"] + "; box-shadow: 0 0 14px 4px " + sexy_theme["button_border"] + ";" if qtype == "Sexy" else ""}
+    }}
+
+    /* Who Here button */
+    .st-key-who_here .stButton button {{
+        background-color: {who_theme["button_bg"]} !important;
+        color: {who_theme["button_text"]} !important;
+        border: 2px solid {who_theme["button_border"]} !important;
+        {"border: 3px solid " + who_theme["button_border"] + "; box-shadow: 0 0 14px 4px " + who_theme["button_border"] + ";" if qtype == "Who Here" else ""}
+    }}
+</style>
 """, unsafe_allow_html=True)
+
 
 # --- Output question card ---
 if st.session_state.current_question:
