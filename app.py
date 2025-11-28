@@ -288,7 +288,14 @@ if st.session_state.current_question:
 else:
     st.markdown(
         """<div style='margin-top: 1rem; text-align: center; font-size: 1.5rem; color: #999;'>
-        Click a question option above to begin.
+        <br>
+        Click a question option above to begin<br>
+        <br>
+        <br>
+        <strong style="color: white;"><b>Patch 3.0 Now Live!</b><br></strong>
+        2 new question categories<br>
+        Significantly reduced question latency<br>
+        New questions in each category
         </div>""",
         unsafe_allow_html=True
     )
