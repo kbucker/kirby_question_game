@@ -209,11 +209,11 @@ with top_right_col:
         get_question("Heavy")
 
 with bottom_left_col:
-    if st.button("🫦 Sexy Question", key="sexy"):
+    if st.button("🫦 Sexy Question BETA", key="sexy"):
         get_question("Sexy")
 
 with bottom_right_col:
-    if st.button("🔄 Who Here...", key="who_here"):
+    if st.button("🔄 Who Here... BETA", key="who_here"):
         get_question("Who Here")
 
 # --- Active theme (updated after click) ---
