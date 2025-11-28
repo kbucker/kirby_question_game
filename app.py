@@ -1,6 +1,3 @@
-## streamlit run app.py
-## http://localhost:8501/
-
 import streamlit as st
 import pandas as pd
 import gspread
@@ -282,3 +279,7 @@ else:
         </div>""",
         unsafe_allow_html=True
     )
+
+## Reminders for local running
+## streamlit run app.py
+## http://localhost:8501/
