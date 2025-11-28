@@ -17,17 +17,30 @@ else:
 client = gspread.authorize(creds)
 
 # --- Load questions ---
-sheet = client.open_by_key("1zW6EmhzKKvpjkeIsbPasrFT6lPly8HWtpDxQS0YGZ9k")
+@st.cache_data(ttl=3600)  # cache questions for 1 hour
+def load_questions():
+    sheet = client.open_by_key("1zW6EmhzKKvpjkeIsbPasrFT6lPly8HWtpDxQS0YGZ9k")
 
-light_df = pd.DataFrame(sheet.worksheet("Light Questions").get_all_records())
-heavy_df = pd.DataFrame(sheet.worksheet("Heavy Questions").get_all_records())
-sexy_df  = pd.DataFrame(sheet.worksheet("Sexy Questions").get_all_records())
-who_df   = pd.DataFrame(sheet.worksheet("Who Here").get_all_records())
+    light_df = pd.DataFrame(sheet.worksheet("Light Questions").get_all_records())
+    heavy_df = pd.DataFrame(sheet.worksheet("Heavy Questions").get_all_records())
+    sexy_df  = pd.DataFrame(sheet.worksheet("Sexy Questions").get_all_records())
+    who_df   = pd.DataFrame(sheet.worksheet("Who Here").get_all_records())
 
-light_questions    = light_df['Question'].dropna().tolist()
-heavy_questions    = heavy_df['Question'].dropna().tolist()
-sexy_questions     = sexy_df['Question'].dropna().tolist()
-who_here_questions = who_df['Question'].dropna().tolist()
+    return {
+        "Light":    light_df['Question'].dropna().tolist(),
+        "Heavy":    heavy_df['Question'].dropna().tolist(),
+        "Sexy":     sexy_df['Question'].dropna().tolist(),
+        "Who Here": who_df['Question'].dropna().tolist()
+    }
+
+# only shows spinner the *first* time cache is empty/expired
+with st.spinner("Loading questions..."):
+    all_questions = load_questions()
+
+light_questions    = all_questions["Light"]
+heavy_questions    = all_questions["Heavy"]
+sexy_questions     = all_questions["Sexy"]
+who_here_questions = all_questions["Who Here"]
 
 # --- Session State ---
 if 'recent_questions' not in st.session_state:
@@ -44,7 +57,7 @@ themes = {
         "text_color": "#F68B1E",
         "border_color": "#B85C00",
         "button_bg": "#FFD580",
-        "button_text": "#B85C00",
+        "button_text": "#8F4600",
         "button_border": "#B85C00"
     },
     "Heavy": {
@@ -61,7 +74,7 @@ themes = {
         "text_color": "#730FC3",   # deep purple
         "border_color": "#730FC3",
         "button_bg": "#AB91D5",   # light purple
-        "button_text": "#730FC3",
+        "button_text": "#5C0A9A",
         "button_border": "#730FC3"
     },
     # New blue theme (Who Here)
@@ -196,7 +209,7 @@ with top_right_col:
         get_question("Heavy")
 
 with bottom_left_col:
-    if st.button("🫦 Sexy Questions", key="sexy"):
+    if st.button("🫦 Sexy Question", key="sexy"):
         get_question("Sexy")
 
 with bottom_right_col:
