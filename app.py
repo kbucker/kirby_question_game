@@ -264,9 +264,9 @@ st.markdown("""
             line-height: 32px !important;
             letter-spacing: 0.5px;
             text-shadow: 1px 1px 1px rgba(0,0,0,0.15);
-            padding: 0.3rem 0.75rem !important;
+            padding: 0.3rem 0.3rem !important;
             width: auto !important;
-            min-width: 200px;
+            min-width: 185px;
             border-radius: 12px;
             margin-bottom: 0.1rem;
             transition: all 0.3s ease;
