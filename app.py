@@ -26,7 +26,7 @@ def load_questions():
     kinky_df  = pd.DataFrame(sheet.worksheet("Kinky Questions").get_all_records())
     compliment_df = pd.DataFrame(sheet.worksheet("Give A Compliment").get_all_records())
     who_here_df   = pd.DataFrame(sheet.worksheet("Who Here Is").get_all_records())
-    drink_if_df = pd.DataFrame(sheet.worksheet("Drink If You've").get_all_records())
+    drink_if_df = pd.DataFrame(sheet.worksheet("Drink If You").get_all_records())
 
     return {
         "Light":    light_df['Question'].dropna().tolist(),
