@@ -461,8 +461,7 @@ else:
         Click a question option above to begin<br>
         <br>
         <strong style="color: white;"><b>Patch 3.0 Now Live!</b><br></strong>
-        2 new question categories!<br>
-        2 new party style modes!<br>
+        4 new categories!<br>
         Much faster response time!<br>
         New questions in each category<br>
         All new categories are still in BETA
