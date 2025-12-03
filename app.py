@@ -23,8 +23,8 @@ def load_questions():
 
     light_df = pd.DataFrame(sheet.worksheet("Light Questions").get_all_records())
     heavy_df = pd.DataFrame(sheet.worksheet("Heavy Questions").get_all_records())
-    kinky_df  = pd.DataFrame(sheet.worksheet("Kinky Questions").get_all_records())
-    compliment_df = pd.DataFrame(sheet.worksheet("Give A Compliment").get_all_records())
+    kinky_df  = pd.DataFrame(sheet.worksheet("Kinky").get_all_records())
+    wholesome_df = pd.DataFrame(sheet.worksheet("Wholesome").get_all_records())
     who_here_df   = pd.DataFrame(sheet.worksheet("Who Here Is").get_all_records())
     drink_if_df = pd.DataFrame(sheet.worksheet("Drink If You").get_all_records())
 
@@ -32,7 +32,7 @@ def load_questions():
         "Light":    light_df['Question'].dropna().tolist(),
         "Heavy":    heavy_df['Question'].dropna().tolist(),
         "Kinky":     kinky_df['Question'].dropna().tolist(),
-        "Compliment": compliment_df['Question'].dropna().tolist(),
+        "Wholesome": wholesome_df['Question'].dropna().tolist(),
         "Who_Here": who_here_df['Question'].dropna().tolist(),
         "Drink_If": drink_if_df['Question'].dropna().tolist()
     }
@@ -44,7 +44,7 @@ with st.spinner("Loading questions..."):
 light_questions    = all_questions["Light"]
 heavy_questions    = all_questions["Heavy"]
 kinky_questions     = all_questions["Kinky"]
-compliment_questions = all_questions["Compliment"]
+wholesome_questions = all_questions["Wholesome"]
 who_here_questions = all_questions["Who_Here"]
 drink_if_questions = all_questions["Drink_If"]
 
@@ -57,124 +57,6 @@ if 'question_type' not in st.session_state:
     st.session_state.question_type = "None"
 
 # --- Themes ---
-# themes = {
-#     "Light": {
-#         "card_bg": "#FFEFCB",
-#         "text_color": "#F68B1E",
-#         "border_color": "#B85C00",
-#         "button_bg": "#FFD580",
-#         "button_text": "#8F4600",
-#         "button_border": "#B85C00"
-#     },
-#     "Heavy": {
-#         "card_bg": "#FFF1E6",      # pale peach/orange background
-#         "text_color": "#D35400",   # deep pumpkin orange
-#         "border_color": "#D35400",
-#         "button_bg": "#FFC9A6",    # soft pastel orange button
-#         "button_text": "#A84300",  # deeper orange for high readability
-#         "button_border": "#D35400"
-#     },
-#     "Kinky": {
-#         "card_bg": "#FFD6DC",
-#         "text_color": "#CC0000",
-#         "border_color": "#990000",
-#         "button_bg": "#FFB3C6",
-#         "button_text": "#990000",
-#         "button_border": "#990000"
-#     },
-#     "Compliment": {
-#         "card_bg": "#E6F7E6",      # pale soft green
-#         "text_color": "#2E7D32",   # warm forest green
-#         "border_color": "#2E7D32",
-#         "button_bg": "#BDE8BD",    # pale mint/green button
-#         "button_text": "#2E7D32",  # strong but friendly forest green
-#         "button_border": "#2E7D32"
-#     },
-#     "Who_Here": {
-#         "card_bg": "#EAF8FF",
-#         "text_color": "#2596BE",
-#         "border_color": "#2596BE",
-#         "button_bg": "#A2CCDC",
-#         "button_text": "#175D7A",
-#         "button_border": "#2596BE"
-#     },
-#     "Default": {
-#         "card_bg": "#2c2c2c",
-#         "text_color": "#ffffff",
-#         "border_color": "#444444",
-#         "button_bg": "#444444",
-#         "button_text": "#ffffff",
-#         "button_border": "#666666"
-#     },
-#     "Drink_If": {
-#         "card_bg": "#F4ECFF",
-#         "text_color": "#730FC3",
-#         "border_color": "#730FC3",
-#         "button_bg": "#AB91D5",
-#         "button_text": "#5C0A9A",
-#         "button_border": "#730FC3"
-#     }
-# }
-
-# themes = {
-#     "Light": {  # Yellow
-#         "card_bg": "#FFF9DC",      # very pale yellow
-#         "text_color": "#C28A00",   # warm golden yellow
-#         "border_color": "#C28A00",
-#         "button_bg": "#FFE48A",    # soft pastel yellow
-#         "button_text": "#8B6500",  # deeper golden-brown for readability
-#         "button_border": "#C28A00"
-#     },
-#     "Heavy": {  # Orange
-#         "card_bg": "#FFE9DC",      # pale peach/orange
-#         "text_color": "#D35400",   # strong orange
-#         "border_color": "#D35400",
-#         "button_bg": "#FFBE99",    # pastel orange
-#         "button_text": "#A84300",  # deeper orange
-#         "button_border": "#D35400"
-#     },
-#     "Kinky": {  # Red
-#         "card_bg": "#FFE5EA",      # very soft red/pink
-#         "text_color": "#C21807",   # rich red
-#         "border_color": "#C21807",
-#         "button_bg": "#FFB3BF",    # light rosy red
-#         "button_text": "#8E0000",  # deep red for contrast
-#         "button_border": "#C21807"
-#     },
-#     "Compliment": {  # Pink
-#         "card_bg": "#FFE8F4",      # pale pink
-#         "text_color": "#C2185B",   # raspberry pink
-#         "border_color": "#C2185B",
-#         "button_bg": "#FFB6DE",    # pastel pink
-#         "button_text": "#8B1340",  # darker berry pink
-#         "button_border": "#C2185B"
-#     },
-#     "Who_Here": {  # Blue
-#         "card_bg": "#E6F2FF",      # very light blue
-#         "text_color": "#1E63B4",   # strong medium blue
-#         "border_color": "#1E63B4",
-#         "button_bg": "#A9C9FF",    # pastel sky blue
-#         "button_text": "#124170",  # deep navy-ish blue
-#         "button_border": "#1E63B4"
-#     },
-#     "Drink_If": {  # Green
-#         "card_bg": "#E6F7EC",      # light minty green
-#         "text_color": "#2E7D32",   # rich green
-#         "border_color": "#2E7D32",
-#         "button_bg": "#B8E6C2",    # pastel green
-#         "button_text": "#1F5422",  # darker forest green
-#         "button_border": "#2E7D32"
-#     },
-#     "Default": {
-#         "card_bg": "#2c2c2c",
-#         "text_color": "#ffffff",
-#         "border_color": "#444444",
-#         "button_bg": "#444444",
-#         "button_text": "#ffffff",
-#         "button_border": "#666666"
-#     }
-# }
-
 themes = {
     "Light": {  # Yellow
         "card_bg": "#FFF7D6",
@@ -200,7 +82,7 @@ themes = {
         "button_text": "#A31258",
         "button_border": "#D81B77"
     },
-    "Compliment": {  # Red
+    "Wholesome": {  # Red
         "card_bg": "#FFA8A8",
         "text_color": "#C21807",
         "border_color": "#C21807",
@@ -289,8 +171,8 @@ def get_question(category: str):
         questions = heavy_questions
     elif category == "Kinky":
         questions = kinky_questions
-    elif category == "Compliment":
-        questions = compliment_questions
+    elif category == "Wholesome":
+        questions = wholesome_questions
     elif category == "Who_Here":
         questions = who_here_questions
     elif category == "Drink_If":
@@ -339,7 +221,7 @@ div[data-testid="stVerticalBlock"] {
 # --- Buttons: 2x2 grid (two horizontal blocks / rows) ---
 # Row 1: Light / Heavy
 row_1_col_1, row_1_col_2 = st.columns([1, 1])
-# Row 2: Kinky / Give A Compliment
+# Row 2: Kinky / Wholesome
 row_2_col_1, row_2_col_2 = st.columns([1, 1])
 # Row 3: Who Here Is / Drink If You've
 row_3_col_1, row_3_col_2 = st.columns([1, 1])
@@ -353,12 +235,12 @@ with row_1_col_2:
         get_question("Heavy")
 
 with row_2_col_1:
-    if st.button("🫦 Kinky Question", key="kinky"):
+    if st.button("🫦 Kinky", key="kinky"):
         get_question("Kinky")
 
 with row_2_col_2:
-    if st.button("❤️ Give A Compliment", key="compliment"):
-        get_question("Compliment")
+    if st.button("❤️ Wholesome", key="wholesome"):
+        get_question("Wholesome")
 
 with row_3_col_1:
     if st.button("🔄 Who Here Is", key="who_here"):
@@ -376,7 +258,7 @@ theme = themes.get(qtype, themes["Default"])
 light_theme = themes["Light"]
 heavy_theme = themes["Heavy"]
 kinky_theme  = themes["Kinky"]
-compliment_theme = themes["Compliment"]
+wholesome_theme = themes["Wholesome"]
 who_here_theme   = themes["Who_Here"]
 drink_if_theme = themes["Drink_If"]
 
@@ -406,12 +288,12 @@ st.markdown(f"""
         {"border: 3px solid " + kinky_theme["button_border"] + "; box-shadow: 0 0 14px 4px " + kinky_theme["button_border"] + ";" if qtype == "Kinky" else ""}
     }}
     
-    /* Give A Compliment button */
-    .st-key-compliment .stButton button {{
-        background-color: {compliment_theme["button_bg"]} !important;
-        color: {compliment_theme["button_text"]} !important;
-        border: 2px solid {compliment_theme["button_border"]} !important;
-        {"border: 3px solid " + compliment_theme["button_border"] + "; box-shadow: 0 0 14px 4px " + compliment_theme["button_border"] + ";" if qtype == "Compliment" else ""}
+    /* Give A Wholesome button */
+    .st-key-wholesome .stButton button {{
+        background-color: {wholesome_theme["button_bg"]} !important;
+        color: {wholesome_theme["button_text"]} !important;
+        border: 2px solid {wholesome_theme["button_border"]} !important;
+        {"border: 3px solid " + wholesome_theme["button_border"] + "; box-shadow: 0 0 14px 4px " + wholesome_theme["button_border"] + ";" if qtype == "Wholesome" else ""}
     }}
     
     /* Who Here button */
