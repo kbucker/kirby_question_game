@@ -16,6 +16,7 @@ else:
     creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
 client = gspread.authorize(creds)
 
+
 # --- Load questions ---
 @st.cache_data(ttl=3600)  # cache questions for 1 hour
 def load_questions():
@@ -23,27 +24,28 @@ def load_questions():
 
     light_df = pd.DataFrame(sheet.worksheet("Light Questions").get_all_records())
     heavy_df = pd.DataFrame(sheet.worksheet("Heavy Questions").get_all_records())
-    kinky_df  = pd.DataFrame(sheet.worksheet("Kinky").get_all_records())
+    kinky_df = pd.DataFrame(sheet.worksheet("Kinky").get_all_records())
     wholesome_df = pd.DataFrame(sheet.worksheet("Wholesome").get_all_records())
-    who_here_df   = pd.DataFrame(sheet.worksheet("Who Here Is").get_all_records())
+    who_here_df = pd.DataFrame(sheet.worksheet("Who Here Is").get_all_records())
     drink_if_df = pd.DataFrame(sheet.worksheet("Drink If You").get_all_records())
 
     return {
-        "Light":    light_df['Question'].dropna().tolist(),
-        "Heavy":    heavy_df['Question'].dropna().tolist(),
-        "Kinky":     kinky_df['Question'].dropna().tolist(),
+        "Light": light_df['Question'].dropna().tolist(),
+        "Heavy": heavy_df['Question'].dropna().tolist(),
+        "Kinky": kinky_df['Question'].dropna().tolist(),
         "Wholesome": wholesome_df['Question'].dropna().tolist(),
         "Who_Here": who_here_df['Question'].dropna().tolist(),
         "Drink_If": drink_if_df['Question'].dropna().tolist()
     }
 
+
 # only shows spinner the *first* time cache is empty/expired
 with st.spinner("Loading questions..."):
     all_questions = load_questions()
 
-light_questions    = all_questions["Light"]
-heavy_questions    = all_questions["Heavy"]
-kinky_questions     = all_questions["Kinky"]
+light_questions = all_questions["Light"]
+heavy_questions = all_questions["Heavy"]
+kinky_questions = all_questions["Kinky"]
 wholesome_questions = all_questions["Wholesome"]
 who_here_questions = all_questions["Who_Here"]
 drink_if_questions = all_questions["Drink_If"]
@@ -157,11 +159,19 @@ st.markdown("""
             align-items: center;
             text-align: center;
         }
+        .section-label {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.5rem;
+            color: #ffffff !important;
+        }
     </style>
 """, unsafe_allow_html=True)
 
 # --- Title ---
 st.markdown("<h3 class='main-title'>🃏 Kirby’s Question Game</h3>", unsafe_allow_html=True)
+
 
 # --- Choose a question ---
 def get_question(category: str):
@@ -193,73 +203,93 @@ def get_question(category: str):
     st.session_state.question_type = category
     st.session_state.recent_questions.append(question)
 
+
 # --- Layout tweaks for the button rows ---
 st.markdown("""
 <style>
-/* Force 2-column grid and center each row of columns */
+/* Force 2-column grid + no extra spacing */
 div[data-testid="stHorizontalBlock"] {
     display: grid !important;
     grid-template-columns: repeat(2, auto) !important;
-    column-gap: 20px !important;
     justify-content: center !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    column-gap: 14px !important; /* reduce side-to-side space */
 }
 
-/* Kill Streamlit’s column padding */
+/* Remove padding around each column */
 div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding: 0 !important;
 }
 
+/* Reduce vertical spacing between button rows */
 div[data-testid="stVerticalBlock"] {
-    gap: 0.5rem !important;
+    gap: 0.2rem !important; /* tighten vertically */
+}
+
+/* Reduce button spacing */
+.stButton button {
+    margin-top: 0.1rem !important;
+    margin-bottom: 0.1rem !important;
+}
+
+/* Reduce label spacing */
+.section-label {
+    margin-top: 0.2rem !important;
+    margin-bottom: 0.6rem !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# --- Buttons: 2x2 grid (two horizontal blocks / rows) ---
+# ----- TOP LABEL: Questions -----
+st.markdown("<div class='section-label'>Questions</div>", unsafe_allow_html=True)
+
+# --- Buttons: 2x2 grid for question categories ---
 # Row 1: Light / Heavy
 row_1_col_1, row_1_col_2 = st.columns([1, 1])
-# Row 2: Kinky / Wholesome
+# Row 2: Sweet / Sexy
 row_2_col_1, row_2_col_2 = st.columns([1, 1])
-# Row 3: Who Here Is / Drink If You've
-row_3_col_1, row_3_col_2 = st.columns([1, 1])
 
 with row_1_col_1:
-    if st.button("🌞 Light Question", key="light"):
+    if st.button("🌞 Light", key="light"):
         get_question("Light")
 
 with row_1_col_2:
-    if st.button("🔥 Heavy Question", key="heavy"):
+    if st.button("🔥 Heavy", key="heavy"):
         get_question("Heavy")
 
 with row_2_col_1:
-    if st.button("🫦 Kinky", key="kinky"):
-        get_question("Kinky")
-
-with row_2_col_2:
-    if st.button("❤️ Wholesome", key="wholesome"):
+    if st.button("❤️ Sweet", key="wholesome"):
         get_question("Wholesome")
 
+with row_2_col_2:
+    if st.button("🫦 Sexy", key="kinky"):
+        get_question("Kinky")
+
+# ----- BOTTOM LABEL: Interactive -----
+st.markdown("<div class='section-label'>Interactive</div>", unsafe_allow_html=True)
+
+# Row 3: Who Here Is / Drink If You've
+row_3_col_1, row_3_col_2 = st.columns([1, 1])
+
 with row_3_col_1:
-    if st.button("🔄 Who Here Is", key="who_here"):
+    if st.button("👉 Point To", key="who_here"):
         get_question("Who_Here")
 
 with row_3_col_2:
-    if st.button("😇 Drink If You've", key="drink_if"):
+    if st.button("🍺 Drink If", key="drink_if"):
         get_question("Drink_If")
 
 # --- Active theme (updated after click) ---
 qtype = st.session_state.question_type
 theme = themes.get(qtype, themes["Default"])
 
-# --- Restyle buttons for all four types ---
+# --- Restyle buttons for all button types ---
 light_theme = themes["Light"]
 heavy_theme = themes["Heavy"]
-kinky_theme  = themes["Kinky"]
+kinky_theme = themes["Kinky"]
 wholesome_theme = themes["Wholesome"]
-who_here_theme   = themes["Who_Here"]
+who_here_theme = themes["Who_Here"]
 drink_if_theme = themes["Drink_If"]
 
 st.markdown(f"""
@@ -287,15 +317,15 @@ st.markdown(f"""
         border: 2px solid {kinky_theme["button_border"]} !important;
         {"border: 3px solid " + kinky_theme["button_border"] + "; box-shadow: 0 0 14px 4px " + kinky_theme["button_border"] + ";" if qtype == "Kinky" else ""}
     }}
-    
-    /* Give A Wholesome button */
+
+    /* Sweet / Wholesome button */
     .st-key-wholesome .stButton button {{
         background-color: {wholesome_theme["button_bg"]} !important;
         color: {wholesome_theme["button_text"]} !important;
         border: 2px solid {wholesome_theme["button_border"]} !important;
         {"border: 3px solid " + wholesome_theme["button_border"] + "; box-shadow: 0 0 14px 4px " + wholesome_theme["button_border"] + ";" if qtype == "Wholesome" else ""}
     }}
-    
+
     /* Who Here button */
     .st-key-who_here .stButton button {{
         background-color: {who_here_theme["button_bg"]} !important;
@@ -303,8 +333,8 @@ st.markdown(f"""
         border: 2px solid {who_here_theme["button_border"]} !important;
         {"border: 3px solid " + who_here_theme["button_border"] + "; box-shadow: 0 0 14px 4px " + who_here_theme["button_border"] + ";" if qtype == "Who_Here" else ""}
     }}
-    
-    /* Drink If You've button */
+
+    /* Drink If button */
     .st-key-drink_if .stButton button {{
         background-color: {drink_if_theme["button_bg"]} !important;
         color: {drink_if_theme["button_text"]} !important;
@@ -313,7 +343,6 @@ st.markdown(f"""
     }}
 </style>
 """, unsafe_allow_html=True)
-
 
 # --- Output question card ---
 if st.session_state.current_question:
