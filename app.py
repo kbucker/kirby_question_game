@@ -373,8 +373,8 @@ else:
         <br>
         <strong style="color: white;"><b>Patch 3.1 Now Live!</b><br></strong>
         Much faster response time!<br>
-        4 new categories!<br>
-        New questions in each category
+        2 new question categories<br>
+        2 new interactive categories
         </div>""",
         unsafe_allow_html=True
     )
