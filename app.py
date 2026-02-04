@@ -372,9 +372,8 @@ else:
         Click a question option above to begin<br>
         <br>
         <strong style="color: white;"><b>Patch 3.1 Now Live!</b><br></strong>
-        Much faster response time!<br>
-        2 new question categories<br>
-        2 new interactive categories
+        Faster response times!<br>
+        4 new question categories
         </div>""",
         unsafe_allow_html=True
     )
