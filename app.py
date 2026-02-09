@@ -371,9 +371,10 @@ else:
         """<div style='margin-top: 1rem; text-align: center; font-size: 1.5rem; color: #999;'>
         Click a question option above to begin<br>
         <br>
-        <strong style="color: white;"><b>Patch 3.1 Now Live!</b><br></strong>
-        Faster response times!<br>
-        4 new question categories
+        <strong style="color: white;"><b>Patch 3.2 Now Live!</b><br></strong>
+        Faster responses!<br>
+        New  categories<br>
+        More questions
         </div>""",
         unsafe_allow_html=True
     )
